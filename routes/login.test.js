@@ -85,6 +85,12 @@ describe("/login", () => {
     });
 
     describe("POST /", () => {
+      it("should return 400 when password isn't provided", async () => {
+        const res = await request(server).post("/login").send({
+          email: user.email
+        });
+        expect(res.statusCode).toEqual(400);
+      });
       it("should return 401 when password doesn't match", async () => {
         const res = await request(server).post("/login").send({
           email: user.email,
