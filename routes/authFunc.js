@@ -1,16 +1,12 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const Token = require("../models/token");
 
 module.exports = async (req, res, next) => {
-  if (!req.header("Authorization")) return res.status(401).send("Access Denied");
+  if (!req.header("Authorization"))
+    return res.status(401).send("Access Denied");
   let idToken = req.header("Authorization").split("Bearer ")[1];
-  try {
-    const userId = jwt.verify(idToken, "secret_key");
-    const user = await User.findOne({ _id: userId });
-    if (!user.auth) throw new Error("Invalid Token");
-    req.userId = userId;
+  const token = await Token.findOne({ token: idToken });
+  if (token) {
+    req.userId = token.userId;
     next();
-  } catch (e) {
-    res.status(401).send(e);
-  }
+  } else res.status(401).send(e);
 };
